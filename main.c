@@ -1,3 +1,4 @@
+#include "cell.h"
 #include "state.h"
 #include "test_cell.h"
 
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
 		printf("Select Action: \n"
 			"\tq: Exit\n"
 			"\te: Evaluate one step of the board state\n"
+			"\ti: Inspect cell candidates\n"
 			"> "
 		);
 
@@ -67,6 +69,26 @@ int main(int argc, char **argv) {
 			case 'e':
 				evalBoard(game_state);
 				break;
+			case 'i':
+			{
+				printf("Input row: ");
+				int row = getInput() - '0';
+				if (row < 0 || row > 9) {
+					printf("Row must be 0 - 9, %d given\n", row);
+					break;
+				}
+
+				printf("Input col: ");
+				int col = getInput() - '0';
+				if (col < 0 || col > 9) {
+					printf("Col must be 0 - 9, %d given\n", col);
+					break;
+				}
+					
+				print_candidates(game_state->board[row][col]);
+				printf("%d\n", game_state->board[row][col]);
+				break;
+			}
 			default:
 				printf("Invalid option: %c\n", input);
 				break;

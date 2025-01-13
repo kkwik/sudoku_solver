@@ -31,8 +31,11 @@ int get_first_candidate(int cell) {
 	return 0;
 }
 
-void print_bits(int val) {
-	for (int i = 0; i < 9; i++) {
-		printf("%d: %d\n", i + 1, val & (1 << i));
+void print_candidates(int cell) {
+	for (int candidate = 1; candidate < 10; candidate++) {
+		if (has_candidate(cell, candidate)) {
+			printf("%d ", candidate);
+		}
 	}
+	printf("\n");	
 }
