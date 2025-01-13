@@ -54,11 +54,14 @@ bool sqrHas(int board[9][9], int sqrI, int val, int skipR, int skipC) {
 }
 
 void printBoard(struct sudoku_board *game_state) {
-	printf("-------------------------\n");
+	printf("    0 1 2   3 4 5   6 7 8\n");
+	printf("  -------------------------\n");
 	for (int r = 0; r < 9; r++) {
 		if (r != 0 && r % 3 == 0) {
-			printf("|-------+-------+-------|\n");
+			printf("  |-------+-------+-------|\n");
 		}
+
+		printf("%d ", r);
 
 		for (int c = 0; c < 9; c++) {
 			if (c % 3 == 0) {
@@ -82,7 +85,7 @@ void printBoard(struct sudoku_board *game_state) {
 			}
 		}
 	}
-	printf("-------------------------\n");
+	printf("  -------------------------\n");
 }
 
 bool evalSimpleRules(struct sudoku_board *state) {
