@@ -4,13 +4,37 @@
 #include <string.h>
 #include <stdbool.h>
 
-void parseBoardString(int board[9][9], char *boardStr) {
+#define COLOR_BOLD  "\e[1m"
+#define COLOR_OFF   "\e[m"
+
+struct sudoku_board {
+	int board[9][9];
+	int readonly[9][9];
+};
+
+void evalBoard(struct sudoku_board *state) {
 	for (int i = 0; i < 81; i++) {
 		int r = i / 9;
 		int c = i % 9;
 
-		board[r][c] = boardStr[i] - '0';
+		printf("Evaluating [%d, %d]:", r, c);
+		
 	}
+}
+
+void parseBoardString(struct sudoku_board *game_state, char *boardStr) {
+	// Load board
+	for (int i = 0; i < 81; i++) {
+		int r = i / 9;
+		int c = i % 9;
+
+		game_state->board[r][c] = boardStr[i] - '0';
+		game_state->readonly[r][c] = boardStr[i] - '0' == 0 ? 0 : 1;
+
+	}
+
+	// Run initial evaluation of board
+	evalBoard(game_state);
 }
 
 char getInput() {
@@ -23,7 +47,7 @@ char getInput() {
 	return input;
 }
 
-void printBoard(int board[9][9]) {
+void printBoard(struct sudoku_board *game_state) {
 	printf("-------------------------\n");
 	for (int r = 0; r < 9; r++) {
 		if (r != 0 && r % 3 == 0) {
@@ -34,7 +58,18 @@ void printBoard(int board[9][9]) {
 			if (c % 3 == 0) {
 				printf("| ");
 			}
-			printf("%d ", board[r][c]);
+
+			bool readonly = game_state->readonly[r][c];
+			int val = game_state->board[r][c];
+			if (val != 0) {
+				if (readonly) {
+					printf(COLOR_BOLD "%d" COLOR_OFF " ", val);
+				} else {
+					printf("%d ", val);
+				}
+			} else {
+				printf("  ");
+			}
 
 			if (c == 8) {
 				printf("|\n");
@@ -89,21 +124,31 @@ int main(int argc, char **argv) {
 
 	if (strlen(boardInput) != 81) {
 		printf("Incorrect board input size: 81 inputs needed, %lu provided\n", strlen(boardInput));
+		return EXIT_FAILURE;
 	}
 
-	int (*board)[9] = malloc(81 * sizeof(int));
-	parseBoardString(board, boardInput);
+	for (int i = 0, c = boardInput[0] - '0'; i < 81; i++, c = boardInput[i] - '0') {
+		if (c < 0 || c > 9) {
+			printf("Invalid board input: inputs must be 0 - 9\n");
+			return EXIT_FAILURE;
+		}
+	}
+
+	struct sudoku_board *game_state = malloc(sizeof(struct sudoku_board));
+
+
+	parseBoardString(game_state, boardInput);
 
 	char input = ' ';
 	do {
 		input = ' ';
 
 		printf("\n");
-		printBoard(board);
+		printBoard(game_state);
 		printf("\n");
 		printf("Select Action: \n"
 			"\tq: Exit\n"
-			"\te: Edit\n"
+			"\te: Evaluate one step of the board state\n"
 			"> "
 		);
 
@@ -112,28 +157,9 @@ int main(int argc, char **argv) {
 		// Handle input
 		switch (input) {
 			case 'q':
-				free(board);
 				break;
 			case 'e':
-				printf("Row to modify: ");
-				int row = getInput() - '0';
-				if (row < 0 || row > 8) {
-					break;
-				}
-
-				printf("Col to modify: ");
-				int col = getInput() - '0';
-				if (col < 0 || col > 8) {
-					break;
-				}
-
-				printf("New value: ");
-				int newVal = getInput() - '0';
-				if (newVal < 0 || newVal > 8) {
-					break;
-				}
-
-				board[row][col] = newVal;
+				evalBoard(game_state);
 				break;
 			default:
 				printf("Invalid option: %c\n", input);
