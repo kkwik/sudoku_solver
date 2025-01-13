@@ -7,7 +7,9 @@
 struct sudoku_board {
 	int board[9][9];
 	int readonly[9][9];
+	int candidates[9][9];
 };
+void printCandidates(int cand);
 void evalBoard(struct sudoku_board *state);
 void parseBoardString(struct sudoku_board *game_state, char *boardStr);
 void printBoard(struct sudoku_board *game_state);
