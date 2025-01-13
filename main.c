@@ -1,9 +1,11 @@
 #include "state.h"
+#include "test_cell.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+
 
 char getInput() {
 	char input = fgetc(stdin);
@@ -16,6 +18,8 @@ char getInput() {
 }
 
 int main(int argc, char **argv) {
+
+	run_cell_tests();
 	
 	if (argc != 2) {
 		printf("Incorrect number of arguments\n");
