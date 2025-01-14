@@ -1,1 +1,1 @@
-gcc -o main *.h *.c 
+gcc -std=c23 -Wall -Wextra -pedantic -o main *.h *.c 

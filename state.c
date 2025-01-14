@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define COLOR_BOLD  "\e[1m"
-#define COLOR_OFF   "\e[m"
+#define FORMAT_BOLD "\x1b[1m"
+#define FORMAT_OFF "\x1b[22m"
 
 bool rowHas(int board[9][9], int r, int val, int skipC) {
 	for (int c = 0; c < 9; c++) {
@@ -72,7 +72,7 @@ void printBoard(struct sudoku_board *game_state) {
 			int val = game_state->board[r][c];
 			if (count_candidates(val) == 1) {
 				if (readonly) {
-					printf(COLOR_BOLD "%d" COLOR_OFF " ", get_first_candidate(val));
+					printf(FORMAT_BOLD "%d" FORMAT_OFF " ", get_first_candidate(val));
 				} else {
 					printf("%d ", get_first_candidate(val));
 				}
