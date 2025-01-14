@@ -109,6 +109,19 @@ bool validBoard(struct sudoku_board *state) {
 	return true;
 }
 
+bool completeBoard(struct sudoku_board *state) {
+	for (int r = 0; r < 9; r++) {
+		for (int c = 0; c < 9; c++) {
+			int cell = state->board[r][c];
+			if (count_candidates(cell) != 1) {
+				return false;
+			}
+		}
+	}
+
+	return validBoard(state);
+}
+
 void evalSimpleRules(struct sudoku_board *state) {
 	bool changed = false;
 	do {
