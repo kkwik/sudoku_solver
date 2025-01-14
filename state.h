@@ -13,6 +13,6 @@ void parseBoardString(struct sudoku_board *game_state, char *boardStr);
 void printBoard(struct sudoku_board *game_state);
 bool rowHas(int board[9][9], int r, int val, int skipC);
 bool colHas(int board[9][9], int c, int val, int skipR);
-bool sqrHas(int board[9][9], int sqrI, int val, int skipR, int skipC);
+bool sqrHas(int board[9][9], int r, int c, int val);
 
 #endif

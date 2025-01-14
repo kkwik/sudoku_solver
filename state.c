@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include "assert.h"
 
 #define FORMAT_BOLD "\x1b[1m"
 #define FORMAT_OFF "\x1b[22m"
@@ -33,16 +34,16 @@ bool colHas(int board[9][9], int c, int val, int skipR) {
 	return false;
 }
 
-bool sqrHas(int board[9][9], int sqrI, int val, int skipR, int skipC) {
-	int sqrRI, sqrCI;
-	sqrRI = sqrI / 3;
-	sqrCI = sqrI % 3;
+bool sqrHas(int board[9][9], int ir, int ic, int val) {
+	int sqr_index = ((ir / 3) * 3) + (ic / 3);
+	int sqr_row_offset = 3 * (sqr_index / 3);
+	int sqr_col_offset = 3 * (sqr_index % 3);
 
 	for (int i = 0; i < 9; i++) {
-		int r = (3 * sqrRI) + (i / 3);
-		int c = (3 * sqrCI) + (i % 3);
+		int r = sqr_row_offset + (i / 3);
+		int c = sqr_col_offset + (i % 3);
 
-		if (r == skipR && c == skipC) {
+		if (r == ir && c == ic) {
 			continue;
 		}
 
@@ -69,12 +70,12 @@ void printBoard(struct sudoku_board *game_state) {
 			}
 
 			bool readonly = game_state->readonly[r][c];
-			int val = game_state->board[r][c];
-			if (count_candidates(val) == 1) {
+			int cell = game_state->board[r][c];
+			if (count_candidates(cell) == 1) {
 				if (readonly) {
-					printf(FORMAT_BOLD "%d" FORMAT_OFF " ", get_first_candidate(val));
+					printf(FORMAT_BOLD "%d" FORMAT_OFF " ", get_first_candidate(cell));
 				} else {
-					printf("%d ", get_first_candidate(val));
+					printf("%d ", get_first_candidate(cell));
 				}
 			} else {
 				printf("  ");
@@ -88,43 +89,61 @@ void printBoard(struct sudoku_board *game_state) {
 	printf("  -------------------------\n");
 }
 
-bool evalSimpleRules(struct sudoku_board *state) {
-	bool changed = false;
-
-	for (int i = 0; i < 81; i++) {
-		int r = i / 9;
-		int c = i % 9;
-
-		if (state->readonly[r][c] == 1 || count_candidates(state->board[r][c]) == 1) {
-			continue;
-		}
-		int sqrI = ((r / 3) * 3) + (c / 3);
-
-		// Unpack candidates to array
-		for (int candidate = 1; candidate < 10; candidate++) {
-			if (has_candidate(state->board[r][c], candidate)) {
-				if (rowHas(state->board, r, candidate, c) || colHas(state->board, c, candidate, r) || sqrHas(state->board, sqrI, candidate, r, c)) {
-					state->board[r][c] = clear_candidate(state->board[r][c], candidate);
-					changed = true;
+bool validBoard(struct sudoku_board *state) {
+	for (int r = 0; r < 9; r++) {
+		for (int c = 0; c < 9; c++) {
+			int cell = state->board[r][c];
+			if (count_candidates(cell) == 1) {
+				int candidate = get_first_candidate(cell);
+				if (rowHas(state->board, r, candidate, c) ||
+					colHas(state->board, c, candidate, r) ||
+					sqrHas(state->board, r, c, candidate)) {
+					printf("Invalid state at [%d, %d] which is %d\n", r, c, candidate);
+					return false;	
 				}
+			} else {
+				continue;
 			}
 		}
 	}
+	return true;
+}
 
-	return changed;
+void evalSimpleRules(struct sudoku_board *state) {
+	bool changed = false;
+	do {
+		changed = false;
+		for (int i = 0; i < 81; i++) {
+			int r = i / 9;
+			int c = i % 9;
+
+			if (state->readonly[r][c] == 1 || count_candidates(state->board[r][c]) == 1) {
+				continue;
+			}
+
+			// Unpack candidates to array
+			for (int candidate = 1; candidate < 10; candidate++) {
+				if (has_candidate(state->board[r][c], candidate)) {
+					if (rowHas(state->board, r, candidate, c) || 
+						colHas(state->board, c, candidate, r) ||
+						sqrHas(state->board, r, c, candidate)) {
+						state->board[r][c] = clear_candidate(state->board[r][c], candidate);
+						changed = true;
+					}
+				}
+			}
+		}
+
+		if (!validBoard(state)) {
+			printf("Invalid board state!\n");
+			printBoard(state);
+			assert(false);
+		}
+	} while (changed);
 }
 
 void evalBoard(struct sudoku_board *state) {
-	printf("Evaluation started\n");
-	bool changed = false;
-	do {
-		changed = evalSimpleRules(state);
-		if (changed) {
-			printBoard(state);
-		}
-	} while (changed);
-
-	printf("Evaluation complete\n");
+	evalSimpleRules(state);
 }
 
 void parseBoardString(struct sudoku_board *game_state, char *boardStr) {
