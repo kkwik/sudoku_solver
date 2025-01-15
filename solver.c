@@ -54,6 +54,10 @@ bool sqrHas(int board[9][9], int ir, int ic, int val) {
 	return false;
 }
 
+bool cannot_place(int board[9][9], int r, int c, int val) {
+	return rowHas(board, r, val, c) || colHas(board, c, val, r) || sqrHas(board, r, c, val);
+}
+
 void printBoard(struct sudoku_board *game_state) {
 	printf("    0 1 2   3 4 5   6 7 8\n");
 	printf("  -------------------------\n");
@@ -95,9 +99,7 @@ bool validBoard(struct sudoku_board *state) {
 			int cell = state->board[r][c];
 			if (count_candidates(cell) == 1) {
 				int candidate = get_first_candidate(cell);
-				if (rowHas(state->board, r, candidate, c) ||
-					colHas(state->board, c, candidate, r) ||
-					sqrHas(state->board, r, c, candidate)) {
+				if (cannot_place(state->board, r, c, candidate)) {
 					printf("Invalid state at [%d, %d] which is %d\n", r, c, candidate);
 					return false;	
 				}
@@ -137,9 +139,7 @@ void evalSimpleRules(struct sudoku_board *state) {
 			// Unpack candidates to array
 			for (int candidate = 1; candidate < 10; candidate++) {
 				if (has_candidate(state->board[r][c], candidate)) {
-					if (rowHas(state->board, r, candidate, c) || 
-						colHas(state->board, c, candidate, r) ||
-						sqrHas(state->board, r, c, candidate)) {
+					if (cannot_place(state->board, r, c, candidate)) {
 						state->board[r][c] = clear_candidate(state->board[r][c], candidate);
 						changed = true;
 					}
