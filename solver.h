@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef SOLVER_H
+#define SOLVER_H
 
 #include <stdbool.h>
 #include <stddef.h>

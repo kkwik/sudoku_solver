@@ -1,4 +1,4 @@
-#include "state.h"
+#include "solver.h"
 #include "cell.h"
 
 #include <stdbool.h>

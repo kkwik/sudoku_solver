@@ -1,5 +1,5 @@
 #include "cell.h"
-#include "state.h"
+#include "solver.h"
 #include "test_cell.h"
 
 #include <stdio.h>
