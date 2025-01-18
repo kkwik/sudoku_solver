@@ -1,10 +1,10 @@
-#include "cell.h"
 #include "solver.h"
+#include "board.h"
+#include "cell.h"
 #include "test_cell.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
 
 
@@ -29,29 +29,20 @@ int main(int argc, char **argv) {
 
 	char* boardInput = *(argv + 1);
 
-	if (strlen(boardInput) != 81) {
-		printf("Incorrect board input size: 81 inputs needed, %lu provided\n", strlen(boardInput));
+
+	struct sudoku_board *board = malloc(sizeof(struct sudoku_board));
+	board = parseBoardString(board, boardInput);
+
+	if (board == NULL) {
 		return EXIT_FAILURE;
 	}
-
-	for (int i = 0, c = boardInput[0] - '0'; i < 81; i++, c = boardInput[i] - '0') {
-		if (c < 0 || c > 9) {
-			printf("Invalid board input: inputs must be 0 - 9\n");
-			return EXIT_FAILURE;
-		}
-	}
-
-	struct sudoku_board *game_state = malloc(sizeof(struct sudoku_board));
-
-
-	parseBoardString(game_state, boardInput);
 
 	char input = ' ';
 	do {
 		input = ' ';
 
 		printf("\n");
-		printBoard(game_state);
+		printBoard(board);
 		printf("\n");
 		printf("Select Action: \n"
 			"\tq: Exit\n"
@@ -67,7 +58,7 @@ int main(int argc, char **argv) {
 			case 'q':
 				break;
 			case 'e':
-				evalBoard(game_state);
+				solve(board);
 				break;
 			case 'i':
 			{
@@ -85,8 +76,8 @@ int main(int argc, char **argv) {
 					break;
 				}
 					
-				print_candidates(game_state->board[row][col]);
-				printf("%d\n", game_state->board[row][col]);
+				print_candidates(board->cells[row][col]);
+				printf("%d\n", board->cells[row][col]);
 				break;
 			}
 			default:
