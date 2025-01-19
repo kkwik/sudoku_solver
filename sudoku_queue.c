@@ -85,7 +85,9 @@ void q_dequeue(struct sudoku_q *q, struct sudoku_board **board) {
 		board = NULL;
 	}
 
-	*board = *q->head;
+	if (board != NULL) {
+		*board = *q->head;
+	}
 	q->head++;
 
 	// Wrap head if necessary
