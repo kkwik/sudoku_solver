@@ -1,6 +1,7 @@
 #include "solver.h"
 #include "cell.h"
 #include "board.h"
+#include "sudoku_queue.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -39,21 +40,57 @@ void eval_rules(struct sudoku_board *board) {
 	} while (changed);
 }
 
-void split(struct sudoku_board *state) {
-	(void)state;
-	// Malloc one board with one option
-	// Malloc another baord with another option
-	// ...
-	//
-	// Add pointer to board in shared queue
+void split(struct sudoku_q *q, struct sudoku_board *board) {
+	for (int i = 0; i < 81; i++) {
+		int r = i / 9;
+		int c = i % 9;
+
+		int candidate_num = count_candidates(board->cells[r][c]);
+		if (candidate_num == 1) {
+			continue;
+		}
+
+		int cell = board->cells[r][c];	
+
+		for (int j = 0; j < candidate_num; j++) {
+			// Create a copy of the current board
+			struct sudoku_board *temp = malloc(sizeof(struct sudoku_board));
+			copy_board(board, temp);	
+
+
+			int candidate = get_first_candidate(cell);
+			clear_candidate(cell, candidate);
+			temp->cells[r][c] = put_candidate(0, candidate);
+			q_queue(q, temp);
+		}
+	}
 }
 
-struct sudoku_board* solve(struct sudoku_board *state) {
-	eval_rules(state);
+struct sudoku_board *solve(struct sudoku_board *board_input) {
+	struct sudoku_q q;
+	q_init(&q, 10);
+	q_queue(&q, board_input);
+	bool solved = false;
 
-	if (!completeBoard(state)) {
-		split(state);
-	}
-	return NULL;
+	do {
+		if (q_empty(&q)) {
+			return NULL;
+		}
+		struct sudoku_board *board;
+		q_dequeue(&q, &board);
+
+		eval_rules(board);
+
+		if (!completeBoard(board)) {
+			// We've evaluated rules as much as possible, make a guess and try
+			split(&q, board);
+		} else {
+			board_input = board;
+			solved = true;
+		}
+	} while (!solved);
+
+	q_dealloc(&q);
+	return board_input;
 }
 

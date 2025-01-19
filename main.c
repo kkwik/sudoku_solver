@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 		printf("\n");
 		printf("Select Action: \n"
 			"\tq: Exit\n"
-			"\te: Evaluate one step of the board state\n"
+			"\ts: Solve the puzzle\n"
 			"\ti: Inspect cell candidates\n"
 			"> "
 		);
@@ -60,8 +60,8 @@ int main(int argc, char **argv) {
 		switch (input) {
 			case 'q':
 				break;
-			case 'e':
-				solve(board);
+			case 's':
+				board = solve(board);
 				break;
 			case 'i':
 			{
