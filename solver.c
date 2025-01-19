@@ -40,7 +40,7 @@ void eval_rules(struct sudoku_board *board) {
 	} while (changed);
 }
 
-void split(struct sudoku_q *q, struct sudoku_board *board) {
+void split(struct sudoku_q *q, struct sudoku_board const *board) {
 	int i = 0;
 	// Fast forward to an interesting cell
 	while (count_candidates(board->cells[i / 9][i % 9]) == 1) {
