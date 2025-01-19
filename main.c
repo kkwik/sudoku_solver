@@ -2,6 +2,8 @@
 #include "board.h"
 #include "cell.h"
 #include "test_cell.h"
+#include "test_queue.h"
+#include "sudoku_queue.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +23,7 @@ char getInput() {
 int main(int argc, char **argv) {
 
 	run_cell_tests();
+	run_queue_tests();
 	
 	if (argc != 2) {
 		printf("Incorrect number of arguments\n");
