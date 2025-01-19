@@ -121,7 +121,7 @@ bool completeBoard(struct sudoku_board *board) {
 	return validBoard(board);
 }
 
-struct sudoku_board* parseBoardString(struct sudoku_board *board, char *boardStr) {
+struct sudoku_board *parse_board(char *boardStr) {
 
 	if (strlen(boardStr) != 81) {
 		printf("Incorrect board input size: 81 inputs needed, %lu provided\n", strlen(boardStr));
@@ -135,6 +135,11 @@ struct sudoku_board* parseBoardString(struct sudoku_board *board, char *boardStr
 		}
 	}
 	// Load board
+	struct sudoku_board *temp = malloc(sizeof(struct sudoku_board));
+	if (temp == NULL) {
+		return NULL;
+	}
+
 	for (int i = 0; i < 81; i++) {
 		int r = i / 9;
 		int c = i % 9;
@@ -142,14 +147,26 @@ struct sudoku_board* parseBoardString(struct sudoku_board *board, char *boardStr
 		int val = boardStr[i] - '0';
 
 		if (val == 0) {
-			board->cells[r][c] = ALL_CANDIDATES;
+			temp->cells[r][c] = ALL_CANDIDATES;
 		} else {
-			board->cells[r][c] = put_candidate(0, val);
+			temp->cells[r][c] = put_candidate(0, val);
 		}
 	}
 
 	// Run initial evaluation of board
-	//evalBoard(game_state);
-	return board;
+	return temp;
+}
+
+void copy_board(struct sudoku_board *original, struct sudoku_board *copy) {
+	*copy = *original;
+}
+
+void populate_board(struct sudoku_board *board, int val) {
+	for (int i = 0; i < 81; i++) {
+		int r = i / 9;
+		int c = i % 9;
+
+		board->cells[r][c] = val;
+	}
 }
 

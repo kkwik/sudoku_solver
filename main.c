@@ -3,6 +3,7 @@
 #include "cell.h"
 #include "test_cell.h"
 #include "test_queue.h"
+#include "test_board.h"
 #include "sudoku_queue.h"
 
 #include <stdio.h>
@@ -24,6 +25,7 @@ int main(int argc, char **argv) {
 
 	run_cell_tests();
 	run_queue_tests();
+	run_board_tests();
 	
 	if (argc != 2) {
 		printf("Incorrect number of arguments\n");
@@ -33,9 +35,7 @@ int main(int argc, char **argv) {
 	char* boardInput = *(argv + 1);
 
 
-	struct sudoku_board *board = malloc(sizeof(struct sudoku_board));
-	board = parseBoardString(board, boardInput);
-
+	struct sudoku_board *board = parse_board(boardInput);
 	if (board == NULL) {
 		return EXIT_FAILURE;
 	}
