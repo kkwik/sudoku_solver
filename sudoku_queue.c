@@ -1,5 +1,6 @@
 #include "sudoku_queue.h"
 #include "board.h"
+#include <stddef.h>
 #include <stdio.h>
 
 struct sudoku_board **wrap_ptr(struct sudoku_board **ptr, struct sudoku_board **buffer_start, struct sudoku_board **buffer_end) {
@@ -10,8 +11,7 @@ struct sudoku_board **wrap_ptr(struct sudoku_board **ptr, struct sudoku_board **
 }
 
 void expand(struct sudoku_q *q) {
-	int current_capacity = q->buffer_end - q->buffer;
-	int new_capacity = 2 * current_capacity;
+	size_t new_capacity = 2 * q_capacity(q);
 
 	struct sudoku_board **temp_buffer = calloc(new_capacity, sizeof(struct sudoku_board *));
 	struct sudoku_board **temp_ptr = temp_buffer;
@@ -32,6 +32,7 @@ void expand(struct sudoku_q *q) {
 	q->buffer_end = q->buffer + new_capacity; 
 	q->head = q->buffer;
 	q->tail = temp_ptr;
+	q->capacity = new_capacity;
 }
 
 
@@ -44,6 +45,8 @@ void q_init(struct sudoku_q *q, size_t initial_size) {
 	q->buffer_end = q->buffer + initial_size;
 	q->head = q->buffer;
 	q->tail = q->buffer;
+	q->count = 0;
+	q->capacity = initial_size;
 }
 
 void q_dealloc(struct sudoku_q *q) {
@@ -60,14 +63,19 @@ bool q_empty(struct sudoku_q *q) {
 	return q->head == q->tail;
 }
 
-int q_capacity(struct sudoku_q *q) {
-	return q->buffer_end - q->buffer;
+size_t q_capacity(struct sudoku_q *q) {
+	return q->capacity;
+}
+
+size_t q_count(struct sudoku_q *q) {
+	return q->count;
 }
 
 void q_queue(struct sudoku_q *q, struct sudoku_board *board) {
 
 	*q->tail = board;
 	q->tail++;
+	q->count++;
 
 	// Wrap tail if necessary
 	q->tail = wrap_ptr(q->tail, q->buffer, q->buffer_end);
@@ -89,6 +97,7 @@ void q_dequeue(struct sudoku_q *q, struct sudoku_board **board) {
 		*board = *q->head;
 	}
 	q->head++;
+	q->count--;
 
 	// Wrap head if necessary
 	q->head = wrap_ptr(q->head, q->buffer, q->buffer_end);

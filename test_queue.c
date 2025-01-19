@@ -2,6 +2,7 @@
 #include "test_queue.h"
 #include "board.h"
 #include "sudoku_queue.h"
+#include <stddef.h>
 #include <stdio.h>
 
 #pragma GCC diagnostic ignored "-Wuninitialized"
@@ -9,11 +10,11 @@
 
 void alloc_dealloc_test() {
 	struct sudoku_q q;
-	int initial_size = 4;
+	size_t initial_size = 4;
 
 	q_init(&q, initial_size);
 
-	int capacity = q_capacity(&q);
+	size_t capacity = q_capacity(&q);
 	assert(capacity == initial_size);
 
 	q_dealloc(&q);
@@ -70,7 +71,7 @@ void test_multiple_queue() {
 
 void test_expand() {
 	struct sudoku_q q;
-	int initial_size = 4;
+	size_t initial_size = 4;
 	q_init(&q, initial_size);
 
 	struct sudoku_board *b1 = (struct sudoku_board *)1;
@@ -92,7 +93,7 @@ void test_expand() {
 
 void test_wrap() {
 	struct sudoku_q q;
-	int initial_size = 4;
+	size_t initial_size = 4;
 	q_init(&q, initial_size);
 
 	struct sudoku_board *b1 = (struct sudoku_board *)1;
@@ -126,7 +127,7 @@ void test_wrap() {
 
 void test_wrap_and_expand() {
 	struct sudoku_q q;
-	int initial_size = 4;
+	size_t initial_size = 4;
 	q_init(&q, initial_size);
 
 	struct sudoku_board *b1 = (struct sudoku_board *)1;
