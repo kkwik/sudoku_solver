@@ -3,14 +3,14 @@
 #include <stdio.h>
 
 struct sudoku_board **wrap_ptr(struct sudoku_board **ptr, struct sudoku_board **buffer_start, struct sudoku_board **buffer_end) {
-	if (ptr > buffer_end) {
+	if (ptr >= buffer_end) {
 		return buffer_start;
 	}
 	return ptr;
 }
 
 void expand(struct sudoku_q *q) {
-	int current_capacity = (q->buffer_end - q->buffer) + 1;
+	int current_capacity = q->buffer_end - q->buffer;
 	int new_capacity = 2 * current_capacity;
 
 	struct sudoku_board **temp_buffer = calloc(new_capacity, sizeof(struct sudoku_board *));
@@ -29,7 +29,7 @@ void expand(struct sudoku_q *q) {
 	
 	// Set q pointers to new buffer
 	q->buffer = temp_buffer;
-	q->buffer_end = q->buffer + (new_capacity - 1); 
+	q->buffer_end = q->buffer + new_capacity; 
 	q->head = q->buffer;
 	q->tail = temp_ptr;
 }
@@ -41,7 +41,7 @@ void q_init(struct sudoku_q *q, size_t initial_size) {
 		q = NULL;
 	}
 
-	q->buffer_end = q->buffer + (initial_size - 1);
+	q->buffer_end = q->buffer + initial_size;
 	q->head = q->buffer;
 	q->tail = q->buffer;
 }
@@ -61,7 +61,7 @@ bool q_empty(struct sudoku_q *q) {
 }
 
 int q_capacity(struct sudoku_q *q) {
-	return (q->buffer_end - q->buffer) + 1;
+	return q->buffer_end - q->buffer;
 }
 
 void q_queue(struct sudoku_q *q, struct sudoku_board *board) {
@@ -102,7 +102,7 @@ void q_print(struct sudoku_q *q) {
 	printf("Head: [%p]\n", (void *)q->head);
 	printf("Tail: [%p]\n", (void *)q->tail);
 
-	for (int i = 0; i <= buffer_size; i++) {
+	for (int i = 0; i < buffer_size; i++) {
 		printf("%c%c | %d: [%p] -> [%p]\n", q->head == (q->buffer + i) ? 'H' : ' ', q->tail == (q->buffer + i) ? 'T' : ' ', i, (void *)(q->buffer + i), (void *)*(q->buffer + i));
 	}
 	printf("\n");
