@@ -10,7 +10,7 @@
 #define FORMAT_BOLD "\x1b[1m"
 #define FORMAT_OFF "\x1b[22m"
 
-bool rowHas(int const board[9][9], int r, int val, int skipC) {
+bool rowHas(int board[9][9], int r, int val, int skipC) {
 	for (int c = 0; c < 9; c++) {
 		if (c == skipC) {
 			continue;
@@ -23,7 +23,7 @@ bool rowHas(int const board[9][9], int r, int val, int skipC) {
 	return false;
 }
 
-bool colHas(int const board[9][9], int c, int val, int skipR) {
+bool colHas(int board[9][9], int c, int val, int skipR) {
 	for (int r = 0; r < 9; r++) {
 		if (r == skipR) {
 			continue;
@@ -36,7 +36,7 @@ bool colHas(int const board[9][9], int c, int val, int skipR) {
 	return false;
 }
 
-bool sqrHas(int const board[9][9], int ir, int ic, int val) {
+bool sqrHas(int board[9][9], int ir, int ic, int val) {
 	int sqr_index = ((ir / 3) * 3) + (ic / 3);
 	int sqr_row_offset = 3 * (sqr_index / 3);
 	int sqr_col_offset = 3 * (sqr_index % 3);
@@ -56,11 +56,11 @@ bool sqrHas(int const board[9][9], int ir, int ic, int val) {
 	return false;
 }
 
-bool cannot_place(int const board[9][9], int r, int c, int val) {
+bool cannot_place(int board[9][9], int r, int c, int val) {
 	return rowHas(board, r, val, c) || colHas(board, c, val, r) || sqrHas(board, r, c, val);
 }
 
-bool validBoard(struct sudoku_board const *board) {
+bool validBoard(struct sudoku_board *board) {
 	for (int r = 0; r < 9; r++) {
 		for (int c = 0; c < 9; c++) {
 			int cell = board->cells[r][c];
@@ -78,7 +78,7 @@ bool validBoard(struct sudoku_board const *board) {
 	return true;
 }
 
-bool completeBoard(struct sudoku_board const *board) {
+bool completeBoard(struct sudoku_board *board) {
 	for (int r = 0; r < 9; r++) {
 		for (int c = 0; c < 9; c++) {
 			int cell = board->cells[r][c];

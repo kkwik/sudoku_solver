@@ -18,7 +18,7 @@ void q_dealloc(struct sudoku_q *q);
 bool q_empty(struct sudoku_q *q);
 size_t q_capacity(struct sudoku_q *q);
 size_t q_count(struct sudoku_q *q);
-void q_queue(struct sudoku_q *q, struct sudoku_board const *board);
+void q_queue(struct sudoku_q *q, struct sudoku_board *board);
 void q_dequeue(struct sudoku_q *q, struct sudoku_board **board);
 void q_print(struct sudoku_q *q);
 

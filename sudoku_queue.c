@@ -71,7 +71,7 @@ size_t q_count(struct sudoku_q *q) {
 	return q->count;
 }
 
-void q_queue(struct sudoku_q *q, struct sudoku_board const *board) {
+void q_queue(struct sudoku_q *q, struct sudoku_board *board) {
 
 	*q->tail = board;
 	q->tail++;
