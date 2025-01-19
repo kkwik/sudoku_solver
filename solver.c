@@ -41,28 +41,34 @@ void eval_rules(struct sudoku_board *board) {
 }
 
 void split(struct sudoku_q *q, struct sudoku_board *board) {
-	for (int i = 0; i < 81; i++) {
-		int r = i / 9;
-		int c = i % 9;
+	int i = 0;
+	// Fast forward to an interesting cell
+	while (count_candidates(board->cells[i / 9][i % 9]) == 1) {
+		i++;
+	}
 
-		int candidate_num = count_candidates(board->cells[r][c]);
-		if (candidate_num == 1) {
-			continue;
-		}
+	int r = i / 9;
+	int c = i % 9;
 
-		int cell = board->cells[r][c];	
+	int candidate_count = count_candidates(board->cells[r][c]);
+	if (candidate_count == 0) {
+		// No possible options for this cell, must be invalid
+		return;
+	}
 
-		for (int j = 0; j < candidate_num; j++) {
-			// Create a copy of the current board
-			struct sudoku_board *temp = malloc(sizeof(struct sudoku_board));
-			copy_board(board, temp);	
+	int cell = board->cells[r][c];	
 
+	for (int j = 0; j < candidate_count; j++) {
+		// Create a copy of the current board
+		struct sudoku_board *temp = malloc(sizeof(struct sudoku_board));
+		copy_board(board, temp);	
 
-			int candidate = get_first_candidate(cell);
-			clear_candidate(cell, candidate);
-			temp->cells[r][c] = put_candidate(0, candidate);
-			q_queue(q, temp);
-		}
+		// Assign the board one of the valid candidates and queue it
+		int candidate = get_first_candidate(cell);
+		cell = clear_candidate(cell, candidate);
+		temp->cells[r][c] = put_candidate(0, candidate);
+		q_queue(q, temp);
+
 	}
 }
 
@@ -71,6 +77,7 @@ struct sudoku_board *solve(struct sudoku_board *board_input) {
 	q_init(&q, 10);
 	q_queue(&q, board_input);
 	bool solved = false;
+	size_t max_count = 0;
 
 	do {
 		if (q_empty(&q)) {
@@ -84,11 +91,13 @@ struct sudoku_board *solve(struct sudoku_board *board_input) {
 		if (!completeBoard(board)) {
 			// We've evaluated rules as much as possible, make a guess and try
 			split(&q, board);
+			max_count = max_count > q_count(&q) ? max_count : q_count(&q);
 		} else {
 			board_input = board;
 			solved = true;
 		}
 	} while (!solved);
+	printf("Queue expanded to hold a maximum of %zu boards\n", max_count);
 
 	q_dealloc(&q);
 	return board_input;
